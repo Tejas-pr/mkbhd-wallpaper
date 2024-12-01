@@ -3,29 +3,21 @@ import ImageCard from "@/components/ImageCard";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import useWallpapers, { Wallpaper } from "@/hooks/useWallpapers";
 import { useState } from "react";
-import { Button, Image, SafeAreaView, Text, View, StyleSheet } from "react-native";
+import {
+  Image,
+  SafeAreaView,
+  Text,
+  View,
+  StyleSheet,
+} from "react-native";
 
 export default function explore() {
-  const [pictureOpen, setPictureOpen] = useState(false);
+  const [pictureOpen, setPictureOpen] = useState<null | Wallpaper>();
   const wallpaperImage = useWallpapers();
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      {/* <View style={{ flex: 1 }}>
-        <Text>Explore</Text>
-        <Button
-          title="Open Bottom Page"
-          onPress={() => {
-            setPictureOpen(true);
-          }}
-        ></Button>
-
-        {pictureOpen && (
-          <DownloadPicture onClose={() => setPictureOpen(false)} />
-        )}
-      </View> */}
-
       <ParallaxScrollView
-        headerBackgroundColor={{ dark: "black", light: "white" }}
+        headerBackgroundColor={{ dark: "white", light: "white" }}
         headerImage={
           <Image
             style={{ flex: 1 }}
@@ -35,17 +27,26 @@ export default function explore() {
           />
         }
       >
-        <Text>Explore</Text>
+        <Text style={styles.text}>Explore</Text>
         <View>
-          <View >
-            {wallpaperImage.map((x: Wallpaper, index: number) =>
-              <View style={styles.innercontainer} key={index}>
-                <ImageCard wallpaper={x}/>
-              </View>
-            )}
+          <View>
+            {wallpaperImage
+              ? wallpaperImage.map((x: Wallpaper, index: number) => (
+                  <View style={styles.innercontainer} key={index}>
+                    <ImageCard wallpaper={x} onPress={
+                      () => {
+                        setPictureOpen(x);
+                      }
+                    }/>
+                  </View>
+                ))
+              : "Loading... "}
           </View>
         </View>
       </ParallaxScrollView>
+      {pictureOpen && (
+          <DownloadPicture wallpaper={pictureOpen} onClose={() => setPictureOpen(null)} />
+        )}
     </SafeAreaView>
   );
 }
@@ -54,6 +55,12 @@ const styles = StyleSheet.create({
   innercontainer: {
     flex: 1,
     padding: 1,
-    gap: 1
+    gap: 1,
+    overflow: "hidden",
   },
-})
+  text: { 
+    fontSize: 25,
+    fontWeight: "bold",
+  },
+});
+
